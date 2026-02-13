@@ -1,4 +1,4 @@
-/* Reset */
+
 * {
     margin: 0;
     padding: 0;
@@ -6,11 +6,11 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: Times New Roman, sans-serif;
     background: #f2f2f2;
 }
 
-/* Header */
+
 header {
     background: #0a1a4f;
     color: white;
@@ -19,7 +19,7 @@ header {
     font-size: 17px;
 }
 
-/* Navigation */
+
 nav {
     background: #1e3a8a;
     display: flex;
@@ -35,7 +35,7 @@ nav a {
     font-weight: 500;
 }
 
-/* Cards Section */
+
 .cards {
     display: grid;
     gap: 25px;
@@ -52,7 +52,7 @@ nav a {
     box-shadow: 0 6px 15px rgba(0,0,0,0.1);
 }
 
-/* Gallery */
+
 .gallery {
     display: grid;
     gap: 20px;
@@ -72,11 +72,7 @@ nav a {
     box-shadow: 0 10px 25px rgba(0,0,0,0.3);
 }
 
-/* ---------------------- */
-/* RESPONSIVE BREAKPOINTS */
-/* ---------------------- */
 
-/* Large Screens */
 @media (min-width: 1024px) {
     .cards {
         grid-template-columns: repeat(3, 1fr);
@@ -91,7 +87,7 @@ nav a {
     }
 }
 
-/* Medium Screens */
+
 @media (min-width: 768px) and (max-width: 1023px) {
     .cards {
         grid-template-columns: repeat(2, 1fr);
@@ -108,7 +104,7 @@ nav a {
     }
 }
 
-/* Small Screens */
+
 @media (max-width: 767px) {
 
     nav {
