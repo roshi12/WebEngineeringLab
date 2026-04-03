@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Dynamic Table Generator</title>
+
+<style>
+body{
+font-family:Arial;
+background:#f3f5f9;
+padding:30px;
+text-align:center;
+}
+
+input{
+padding:8px;
+margin:5px;
+width:80px;
+}
+
+button{
+padding:8px 14px;
+cursor:pointer;
+}
+
+table{
+margin:20px auto;
+border-collapse:collapse;
+}
+
+td{
+border:1px solid #aaa;
+padding:10px 18px;
+transition:.2s;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Dynamic Table Generator</h2>
+
+Rows:
+<input id="rows" type="number" min="1">
+
+Columns:
+<input id="cols" type="number" min="1">
+
+<button onclick="generate()">Generate</button>
+
+<div id="tableArea"></div>
+
+<script>
+
+function generate(){
+
+let r = parseInt(rows.value)
+let c = parseInt(cols.value)
+
+if(!r || !c || r<1 || c<1){
+alert("Enter valid row and column numbers")
+return
+}
+
+const area = document.getElementById("tableArea")
+area.innerHTML=""   // clear previous table
+
+let table=document.createElement("table")
+
+for(let i=1;i<=r;i++){
+
+let tr=document.createElement("tr")
+
+for(let j=1;j<=c;j++){
+
+let td=document.createElement("td")
+td.textContent=`(${i},${j})`
+
+// hover effect via JS
+td.addEventListener("mouseenter",()=>{
+td.style.background="#dbeafe"
+})
+
+td.addEventListener("mouseleave",()=>{
+td.style.background=""
+})
+
+tr.appendChild(td)
+}
+
+// alternating row styling
+if(i%2===0) tr.style.background="#f1f5f9"
+
+table.appendChild(tr)
+
+}
+
+area.appendChild(table)
+
+}
+
+</script>
+
+</body>
+</html>

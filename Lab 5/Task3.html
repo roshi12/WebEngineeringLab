@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Mini Kanban Board</title>
+
+<style>
+body{
+font-family:Arial;
+background:#f4f6f9;
+margin:0;
+padding:20px;
+}
+
+h1{ text-align:center }
+
+.board{
+display:flex;
+gap:20px;
+margin-top:20px;
+}
+
+.col{
+flex:1;
+background:white;
+padding:15px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,.1);
+min-height:300px;
+}
+
+.col h2{ margin-top:0 }
+
+.task{
+background:#fafafa;
+padding:10px;
+border-radius:6px;
+margin-bottom:10px;
+cursor:grab;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.low{border-left:6px solid #4caf50}
+.med{border-left:6px solid #ff9800}
+.high{border-left:6px solid #f44336}
+
+button{
+cursor:pointer;
+border:none;
+padding:4px 8px;
+border-radius:4px;
+background:#e74c3c;
+color:white;
+}
+
+.add{
+margin-top:20px;
+display:flex;
+gap:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Mini Kanban Board</h1>
+
+<div class="add">
+<input id="taskInput" placeholder="Enter task">
+<select id="priority">
+<option value="low">Low</option>
+<option value="med">Medium</option>
+<option value="high">High</option>
+</select>
+<button onclick="addTask()">Add</button>
+</div>
+
+<div class="board">
+
+<div class="col" data-status="todo">
+<h2>To-Do</h2>
+</div>
+
+<div class="col" data-status="progress">
+<h2>In Progress</h2>
+</div>
+
+<div class="col" data-status="done">
+<h2>Done</h2>
+</div>
+
+</div>
+
+<script>
+
+let board = JSON.parse(localStorage.getItem("kanban")) || []
+
+function save(){
+localStorage.setItem("kanban",JSON.stringify(board))
+}
+
+function render(){
+
+document.querySelectorAll(".col").forEach(c=>{
+c.querySelectorAll(".task").forEach(t=>t.remove())
+})
+
+board.forEach(t=>{
+const el=document.createElement("div")
+el.className="task "+t.priority
+el.draggable=true
+el.dataset.id=t.id
+
+el.innerHTML=`
+<span>${t.text}</span>
+<button onclick="del('${t.id}')">X</button>
+`
+
+el.addEventListener("dragstart",dragStart)
+
+document
+.querySelector(`[data-status=${t.status}]`)
+.appendChild(el)
+})
+
+save()
+}
+
+function addTask(){
+
+const text=document.getElementById("taskInput").value.trim()
+const pr=document.getElementById("priority").value
+
+if(!text) return
+
+board.push({
+id:Date.now(),
+text:text,
+priority:pr,
+status:"todo"
+})
+
+document.getElementById("taskInput").value=""
+render()
+}
+
+function del(id){
+board=board.filter(t=>t.id!=id)
+render()
+}
+
+let dragged=null
+
+function dragStart(e){
+dragged=e.target.dataset.id
+}
+
+document.querySelectorAll(".col").forEach(col=>{
+
+col.addEventListener("dragover",e=>e.preventDefault())
+
+col.addEventListener("drop",()=>{
+const task=board.find(t=>t.id==dragged)
+task.status=col.dataset.status
+render()
+})
+
+})
+
+render()
+
+</script>
+
+</body>
+</html>

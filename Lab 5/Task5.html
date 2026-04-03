@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nested Students Table</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+  th { cursor: pointer; background-color: #f2f2f2; }
+  tr:hover { background-color: #f9f9f9; }
+  .low-score { background-color: #f8d7da; } /* red-ish for score < 50 */
+  .nested { display: none; }
+  .expand-btn { cursor: pointer; color: blue; text-decoration: underline; }
+  input { margin-bottom: 10px; padding: 5px; width: 200px; }
+</style>
+</head>
+<body>
+
+<h2>Student Courses Table</h2>
+
+<input type="text" id="searchInput" placeholder="Search by student or course">
+
+<table id="studentsTable">
+  <thead>
+    <tr>
+      <th data-column="name">Student Name</th>
+      <th data-column="course">Course</th>
+      <th data-column="score">Score</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody">
+    <!-- Rows will be dynamically generated -->
+  </tbody>
+</table>
+
+<script>
+const students = [
+  {
+    name: "Alice",
+    courses: [
+      { course: "Math", score: 80 },
+      { course: "History", score: 45 }
+    ]
+  },
+  {
+    name: "Bob",
+    courses: [
+      { course: "Math", score: 60 },
+      { course: "Science", score: 90 }
+    ]
+  },
+  {
+    name: "Charlie",
+    courses: [
+      { course: "Math", score: 30 },
+      { course: "English", score: 70 }
+    ]
+  }
+];
+
+// Generate table rows
+function renderTable(data) {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+
+  data.forEach((student, index) => {
+    // Main student row
+    const trMain = document.createElement('tr');
+    trMain.classList.add('main-row');
+    trMain.innerHTML = `
+      <td><span class="expand-btn" data-index="${index}">▶</span> ${student.name}</td>
+      <td></td>
+      <td></td>
+    `;
+    tbody.appendChild(trMain);
+
+    // Nested course rows
+    student.courses.forEach(course => {
+      const trNested = document.createElement('tr');
+      trNested.classList.add('nested');
+      if(course.score < 50) trNested.classList.add('low-score');
+      trNested.innerHTML = `
+        <td></td>
+        <td>${course.course}</td>
+        <td>${course.score}</td>
+      `;
+      tbody.appendChild(trNested);
+    });
+  });
+
+  addExpandListeners();
+}
+
+// Expand/collapse nested rows
+function addExpandListeners() {
+  document.querySelectorAll('.expand-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const index = parseInt(btn.dataset.index);
+      const rows = document.querySelectorAll('#tableBody tr');
+      let count = 0;
+      for(let i = 0; i < rows.length; i++) {
+        if(rows[i].classList.contains('main-row')) {
+          if(count === index) {
+            // toggle next rows until next main row
+            let j = i+1;
+            while(j < rows.length && !rows[j].classList.contains('main-row')) {
+              rows[j].style.display = rows[j].style.display === 'table-row' ? 'none' : 'table-row';
+              j++;
+            }
+            btn.textContent = btn.textContent === '▶' ? '▼' : '▶';
+            break;
+          }
+          count++;
+        }
+      }
+    });
+  });
+}
+
+// Sorting
+let sortDirection = { name: 1, course: 1, score: 1 };
+document.querySelectorAll('th').forEach(th => {
+  th.addEventListener('click', () => {
+    const column = th.dataset.column;
+
+    if(column === 'name') {
+      students.sort((a,b) => a.name.localeCompare(b.name) * sortDirection[column]);
+    } else if(column === 'course') {
+      students.forEach(s => s.courses.sort((a,b) => a.course.localeCompare(b.course) * sortDirection[column]));
+    } else if(column === 'score') {
+      students.forEach(s => s.courses.sort((a,b) => (a.score - b.score) * sortDirection[column]));
+    }
+    sortDirection[column] *= -1;
+    renderTable(students);
+  });
+});
+
+// Search filter
+document.getElementById('searchInput').addEventListener('input', e => {
+  const term = e.target.value.toLowerCase();
+  const filtered = students.map(s => {
+    const filteredCourses = s.courses.filter(c => c.course.toLowerCase().includes(term));
+    if(s.name.toLowerCase().includes(term) || filteredCourses.length > 0) {
+      return { name: s.name, courses: filteredCourses.length > 0 ? filteredCourses : s.courses };
+    }
+    return null;
+  }).filter(Boolean);
+
+  renderTable(filtered);
+});
+
+// Initial render
+renderTable(students);
+</script>
+
+</body>
+</html>
